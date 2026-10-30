@@ -7,7 +7,7 @@ from core.cloud import CloudManager
 
 
 def main():
-  TOKEN = "твой_реальный_токен"
+  TOKEN = "-"
   REMOTE_DIR = "/minecraft_sync"
   REMOTE_ZIP_PATH = f"{REMOTE_DIR}/world.zip"
   REMOTE_STATUS_PATH = f"{REMOTE_DIR}/status.json"
