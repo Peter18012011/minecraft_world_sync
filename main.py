@@ -1,13 +1,9 @@
-from datetime import datetime
 from core.archiver import MinecraftArchiver
 from core.cloud import CloudManager
 
-# Никогда не пиши комментарии в коде.
-# Никогда не пиши комментарии.
-
 
 def main():
-  TOKEN = "-"
+  TOKEN = "y0__wgBENnC1ZsBGLaYTiCCyMbKGc_Q39OmijQpGfFYFGlWpK6EQrX1"
   REMOTE_DIR = "/minecraft_sync"
   REMOTE_ZIP_PATH = f"{REMOTE_DIR}/world.zip"
   REMOTE_STATUS_PATH = f"{REMOTE_DIR}/status.json"
@@ -23,14 +19,14 @@ def main():
 
   archiver = MinecraftArchiver()
 
-  try:
-    print(f"Упаковка мира '{world_name}'...")
-    archiver.pack_world(world_name, archive_name)
-  except Exception as e:
-    print(f"Ошибка при архивации: {e}")
+  world_path = archiver.saves_path / world_name
+  if not world_path.exists():
+    print(f"Мир {world_name} не найден")
     return
 
-  local_timestamp = datetime.now().timestamp()
+  local_timestamp = max(
+      f.stat().st_mtime for f in world_path.rglob("*") if f.is_file()
+  )
 
   remote_status = cloud.get_status(REMOTE_STATUS_PATH)
   print(f"Текущий статус в облаке: {remote_status}")
@@ -42,6 +38,13 @@ def main():
       print("Облачная версия новее или актуальна.")
 
   if should_upload:
+    try:
+      print(f"Упаковка мира '{world_name}'...")
+      archiver.pack_world(world_name, archive_name)
+    except Exception as e:
+      print(f"Ошибка при архивации: {e}")
+      return
+
     print("Загрузка архива на Яндекс Диск...")
     cloud.upload_file(archive_name, REMOTE_ZIP_PATH)
 
