@@ -77,3 +77,12 @@ class CloudManager:
         if self.client.exists(remote_status_path):
             self.client.remove(remote_status_path, permanently=True)
         self.client.upload(buffer, remote_status_path)
+    
+    def delete_world(self, world_id):
+        world_dir = f"minecraft_sync/worlds/{world_id}"
+        if self.client.exists(world_dir):
+            self.client.remove(world_dir, permanently=True, recursive=True)
+        
+        index = self.get_worlds_index()
+        updated_index = [w for w in index if w.get("world_id") != world_id and w.get("name") != world_id]
+        self.update_worlds_index(updated_index)

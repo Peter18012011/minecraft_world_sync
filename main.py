@@ -12,8 +12,25 @@ def get_world_name(cloud):
         for index_num, world_info in enumerate(index, 1):
             print(f"{index_num}. {world_info.get('name')}")
         print("0. Ввести новое имя мира")
+        print("D. Удалить мир из облака")
 
-        user_choice = input("Введите номер мира или укажите имя папки из saves: ").strip()
+        user_choice = input("Введите номер, имя или команду: ").strip()
+
+        if user_choice.upper() == "D":
+            print("\n--- Удаление мира ---")
+            for index_num, world_info in enumerate(index, 1):
+                print(f"{index_num}. {world_info.get('name')}")
+            del_choice = input("Введите номер мира для удаления: ").strip()
+            if del_choice.isdigit():
+                del_index = int(del_choice)
+                if 1 <= del_index <= len(index):
+                    target_world = index[del_index - 1]["name"]
+                    confirm = input(f"Точно удалить мир '{target_world}' из облака? (y/n): ").strip().lower()
+                    if confirm == "y":
+                        cloud.delete_world(target_world)
+                        print(f"Мир '{target_world}' удален из облака.")
+                    return None
+            return None
 
         if user_choice.isdigit():
             choice_index = int(user_choice)
@@ -35,7 +52,7 @@ def get_world_name(cloud):
 
 
 def main():
-    TOKEN = "y0__wgBENnC1ZsBGLaYTiCCyMbKGc_Q39OmijQpGfFYFGlWpK6EQrX1"
+    TOKEN = "-"
     cloud = CloudManager(TOKEN)
 
     if not cloud.check_connection():
@@ -43,6 +60,9 @@ def main():
         return
 
     world_name = get_world_name(cloud)
+    if not world_name:
+        return
+
     world_id = world_name
     archive_name = f"{world_id}.zip"
 
@@ -82,7 +102,7 @@ def main():
                 archiver.unpack_world(archive_name, world_name)
                 print("Локальный мир успешно обновлен из облака.")
             except Exception as e:
-                print(feb:= f"Ошибка при распаковке: {e}")
+                print(f"Ошибка при распаковке: {e}")
             finally:
                 if os.path.exists(archive_name):
                     os.remove(archive_name)
